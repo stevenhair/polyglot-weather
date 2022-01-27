@@ -1,14 +1,13 @@
 #!/usr/bin/env node
 import axios from 'axios';
+import minimist from 'minimist';
 
 const API_KEY = process.env.FREEGEOIP_API_KEY;
-const LOG_LEVEL = process.env.LOGLEVEL ?? 'info';
 
-const logLevels = ['debug', 'info', 'warn', 'error'];
-const currentLogLevel = logLevels.indexOf(LOG_LEVEL);
+let verbose = false;
 
 function log(level, ...message) {
-    if (logLevels.indexOf(level) >= currentLogLevel) {
+    if (verbose || level !== 'debug') {
         console[level](...message);
     }
 }
@@ -30,7 +29,7 @@ async function getCoordinates() {
     }
 }
 
-async function getCurrentWeather(coordinates) {
+async function getCurrentWeather(coordinates, units) {
     const metadataUrl = `https://api.weather.gov/points/${coordinates.join(',')}`;
     log('debug', `Fetching NWS location metadata from ${metadataUrl}`);
 
@@ -38,7 +37,7 @@ async function getCurrentWeather(coordinates) {
     let location;
     try {
         const response = await axios.get(metadataUrl);
-        forecastUrl = response.data.properties.forecastHourly;
+        forecastUrl = `${response.data.properties.forecastHourly}?units=${units === 'metric' ? 'si' : 'us'}`;
         location = response.data.properties.relativeLocation.properties;
     } catch (e) {
         exitWithError(`Failed to fetch NWS location metadata`, e.message);
@@ -80,6 +79,40 @@ function getOutput(weather) {
         `${weather.shortForecast.toLowerCase()} in ${weather.location}.`;
 }
 
+function printHelp() {
+    console.log(`usage: ${process.argv[1]} [--units UNITS]
+Display the weather for the current location
+
+Arguments:
+  -h, --help            Show this message
+  -u, --units UNITS     Output weather in the specified units. "us" for US units (°F, mph, etc.) and "metric" for metric
+                        units (°C, kph, etc.). Default: us
+  -v, --verbose         Show more output
+`);
+}
+
+function processArguments() {
+    const args = minimist(process.argv.slice(2));
+
+    if (args.h || args.help) {
+        printHelp();
+        process.exit();
+    }
+    
+    verbose = !!(args.v || args.verbose);
+
+    const processed = {
+        units: args.u ?? args.units ?? 'us',
+    };
+
+    if (!['us', 'metric'].includes(processed.units)) {
+        exitWithError(`"${processed.units}" is not a valid choice for units`);
+    }
+
+    return processed;
+}
+
+const args = processArguments();
 const coordinates = await getCoordinates();
-const weather = await getCurrentWeather(coordinates);
+const weather = await getCurrentWeather(coordinates, args.units);
 console.log(getOutput(weather));

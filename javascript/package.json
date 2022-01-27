@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/stevenhair/polyglot-weather#readme",
   "dependencies": {
-    "axios": "^0.25.0"
+    "axios": "^0.25.0",
+    "minimist": "^1.2.5"
   }
 }
