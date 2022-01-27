@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import axios from 'axios';
+import { writeFile } from 'fs/promises';
 import minimist from 'minimist';
 
 const API_KEY = process.env.FREEGEOIP_API_KEY;
@@ -80,11 +81,12 @@ function getOutput(weather) {
 }
 
 function printHelp() {
-    console.log(`usage: ${process.argv[1]} [--units UNITS]
+    console.log(`usage: ${process.argv[1]} [--units UNITS] [--output FILENAME]
 Display the weather for the current location
 
 Arguments:
   -h, --help            Show this message
+  -o, --out FILE        Write output to FILE instead of printing to STDOUT
   -u, --units UNITS     Output weather in the specified units. "us" for US units (°F, mph, etc.) and "metric" for metric
                         units (°C, kph, etc.). Default: us
   -v, --verbose         Show more output
@@ -98,10 +100,11 @@ function processArguments() {
         printHelp();
         process.exit();
     }
-    
+
     verbose = !!(args.v || args.verbose);
 
     const processed = {
+        output: args.o ?? args.output,
         units: args.u ?? args.units ?? 'us',
     };
 
@@ -112,7 +115,20 @@ function processArguments() {
     return processed;
 }
 
+async function writeOutput(output, filename) {
+    if (!filename) {
+        console.log(output);
+    }
+
+    try {
+        await writeFile(filename, output);
+    } catch (e) {
+        exitWithError(`Failed to write file: ${e.message}`);
+    }
+}
+
 const args = processArguments();
 const coordinates = await getCoordinates();
 const weather = await getCurrentWeather(coordinates, args.units);
-console.log(getOutput(weather));
+const output = getOutput(weather);
+await writeOutput(output, args.output);
