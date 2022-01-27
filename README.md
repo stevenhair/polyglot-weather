@@ -18,3 +18,4 @@ The idea here is that I'll get an introduction to various aspects of a programmi
 JSON, CLI arguments, file I/O, and error handling. Those are pretty much the basics for being dangerous in a language.
 
 ## Support languages
+* JavaScript
