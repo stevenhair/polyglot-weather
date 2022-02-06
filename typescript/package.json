@@ -1,0 +1,34 @@
+{
+  "name": "js-weather",
+  "version": "1.0.0",
+  "description": "A simple app to fetch the current weather",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stevenhair/polyglot-weather.git"
+  },
+  "keywords": [
+    "weather"
+  ],
+  "author": "Steven Hair",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/stevenhair/polyglot-weather/issues"
+  },
+  "homepage": "https://github.com/stevenhair/polyglot-weather#readme",
+  "dependencies": {
+    "axios": "^0.25.0",
+    "minimist": "^1.2.5"
+  },
+  "devDependencies": {
+    "@types/minimist": "^1.2.2",
+    "ts-node": "^10.4.0",
+    "typescript": "^4.5.5"
+  }
+}

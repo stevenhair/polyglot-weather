@@ -1,24 +1,49 @@
-#!/usr/bin/env node
+#!/usr/bin/env ts-node
 import axios from 'axios';
 import { writeFile } from 'fs/promises';
 import minimist from 'minimist';
+
+type LogLevel = 'debug' | 'info' | 'error';
+interface Weather {
+    location: string,
+    temperature: number,
+    temperatureUnit: string,
+    windSpeed: string,
+    windDirection: string,
+    shortForecast: string,
+}
 
 const API_KEY = process.env.FREEGEOIP_API_KEY;
 
 let verbose = false;
 
-function log(level, ...message) {
+function isError(e: unknown): e is Error {
+    return Object.prototype.hasOwnProperty.call(e, 'message') && Object.prototype.hasOwnProperty.call(e, 'stack');
+}
+
+function log(level: LogLevel, ...message: unknown[]): void {
     if (verbose || level !== 'debug') {
         console[level](...message);
     }
 }
 
-function exitWithError(message) {
+function exitWithError(message: string, error?: unknown): never {
+    if (error) {
+        if (isError(error)) {
+            message += `: ${error.message}`;
+            if (axios.isAxiosError(error)) {
+                message += ` - ${error.response?.data}`;
+            }
+        } else {
+            message += `: ${error}`;
+        }
+    }
+
     log('error', message);
     process.exit(1);
 }
 
-async function getCoordinates() {
+async function getCoordinates(): Promise<[number, number]> {
     const url = `https://api.freegeoip.app/json/?apikey=${API_KEY}`;
     log('debug', `Fetching GeoIP data from ${url}`);
 
@@ -26,11 +51,11 @@ async function getCoordinates() {
         const response = await axios.get(url);
         return [response.data.latitude, response.data.longitude];
     } catch (e) {
-        exitWithError(`Failed to get current location: ${e.message}`);
+        exitWithError('Failed to get current location', e);
     }
 }
 
-async function getCurrentWeather(coordinates, units) {
+async function getCurrentWeather(coordinates: [number, number], units: 'metric' | 'us'): Promise<Weather> {
     const metadataUrl = `https://api.weather.gov/points/${coordinates.join(',')}`;
     log('debug', `Fetching NWS location metadata from ${metadataUrl}`);
 
@@ -41,7 +66,7 @@ async function getCurrentWeather(coordinates, units) {
         forecastUrl = `${response.data.properties.forecastHourly}?units=${units === 'metric' ? 'si' : 'us'}`;
         location = response.data.properties.relativeLocation.properties;
     } catch (e) {
-        exitWithError(`Failed to fetch NWS location metadata`, e.message);
+        exitWithError(`Failed to fetch NWS location metadata`, e);
     }
 
     let now;
@@ -50,7 +75,7 @@ async function getCurrentWeather(coordinates, units) {
         const response = await axios.get(forecastUrl);
         now = response.data.properties.periods[0];
     } catch (e) {
-        exitWithError(`Failed to fetch NWS location metadata`, e.message);
+        exitWithError('Failed to fetch NWS location metadata', e);
     }
 
     return {
@@ -63,7 +88,7 @@ async function getCurrentWeather(coordinates, units) {
     };
 }
 
-function getPeriodOfDay() {
+function getPeriodOfDay(): 'morning' | 'afternoon' | 'evening' {
     const currentHour = new Date().getHours();
 
     if (currentHour < 12) {
@@ -75,12 +100,12 @@ function getPeriodOfDay() {
     }
 }
 
-function getOutput(weather) {
+function getOutput(weather: Weather): string {
     return`Good ${getPeriodOfDay()}! It is ${weather.temperature}°${weather.temperatureUnit} and ` +
         `${weather.shortForecast.toLowerCase()} in ${weather.location}.`;
 }
 
-function printHelp() {
+function printHelp(): void {
     console.log(`usage: ${process.argv[1]} [--units UNITS] [--output FILENAME]
 Display the weather for the current location
 
@@ -93,7 +118,7 @@ Arguments:
 `);
 }
 
-function processArguments() {
+function processArguments(): { output: string, units: 'metric' | 'us' } {
     const args = minimist(process.argv.slice(2));
 
     if (args.h || args.help) {
@@ -115,7 +140,7 @@ function processArguments() {
     return processed;
 }
 
-async function writeOutput(output, filename) {
+async function writeOutput(output: string, filename: string): Promise<void> {
     if (!filename) {
         console.log(output);
         return;
@@ -124,7 +149,7 @@ async function writeOutput(output, filename) {
     try {
         await writeFile(filename, output);
     } catch (e) {
-        exitWithError(`Failed to write file: ${e.message}`);
+        exitWithError('Failed to write file', e);
     }
 }
 

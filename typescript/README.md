@@ -9,4 +9,5 @@ Just run `npm install` in this directory
 
 ## Running
 1. Set your API key as an environment variable named `FREEGEOIP_API_KEY`
-2. Run `./index.js`. For a full list of options, run `./index.js -h`.
+2. Run `npm run build`. This transpiles from TypeScript to JavaScript.
+3. Run `node dist/index.js`. For a full list of options, pass the `--help` flag.
