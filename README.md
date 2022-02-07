@@ -6,7 +6,7 @@ It's been a while since I learned a new programming language, and I thought that
 one. I don't really do well with tutorials, so I decided to set myself a small project.
 
 ## The goal
-Thw goal is to just write a simple command-line app to fetch the current weather at the current location. Here are the steps:
+The goal is to just write a simple command-line app to fetch the current weather at the current location. Here are the steps:
 
 1. Read the API key for [freegeoip.app](https://freegeoip.app/) from an environment variable
 2. Call FreeGeoIpAPI to get the coordinates of the current IP address
