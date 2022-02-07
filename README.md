@@ -17,6 +17,6 @@ Thw goal is to just write a simple command-line app to fetch the current weather
 The idea here is that I'll get an introduction to various aspects of a programming language, including HTTP calls, parsing
 JSON, CLI arguments, file I/O, and error handling. Those are pretty much the basics for being dangerous in a language.
 
-## Support languages
+## Supported languages
 * JavaScript
 * TypeScript
