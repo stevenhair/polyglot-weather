@@ -75,7 +75,7 @@ async function getCurrentWeather(coordinates: [number, number], units: 'metric' 
         const response = await axios.get(forecastUrl);
         now = response.data.properties.periods[0];
     } catch (e) {
-        exitWithError('Failed to fetch NWS location metadata', e);
+        exitWithError('Failed to fetch NWS forecast', e);
     }
 
     return {
@@ -106,12 +106,12 @@ function getOutput(weather: Weather): string {
 }
 
 function printHelp(): void {
-    console.log(`usage: ${process.argv[1]} [--units UNITS] [--output FILENAME]
+    console.log(`usage: ${process.argv[1]} [--units UNITS] [--output FILE]
 Display the weather for the current location
 
 Arguments:
   -h, --help            Show this message
-  -o, --out FILE        Write output to FILE instead of printing to STDOUT
+  -o, --output FILE     Write output to FILE instead of printing to STDOUT
   -u, --units UNITS     Output weather in the specified units. "us" for US units (°F, mph, etc.) and "metric" for metric
                         units (°C, kph, etc.). Default: us
   -v, --verbose         Show more output

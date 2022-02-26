@@ -20,3 +20,4 @@ JSON, CLI arguments, file I/O, and error handling. Those are pretty much the bas
 ## Supported languages
 * JavaScript
 * TypeScript
+* Python
