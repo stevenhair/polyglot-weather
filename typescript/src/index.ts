@@ -13,7 +13,7 @@ interface Weather {
     shortForecast: string,
 }
 
-const API_KEY = process.env.FREEGEOIP_API_KEY;
+const API_KEY = process.env.IPBASE_API_KEY;
 
 let verbose = false;
 
@@ -44,7 +44,7 @@ function exitWithError(message: string, error?: unknown): never {
 }
 
 async function getCoordinates(): Promise<[number, number]> {
-    const url = `https://api.freegeoip.app/json/?apikey=${API_KEY}`;
+    const url = `https://api.ipbase.com/json/?apikey=${API_KEY}`;
     log('debug', `Fetching GeoIP data from ${url}`);
 
     try {

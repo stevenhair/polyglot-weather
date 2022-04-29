@@ -8,8 +8,8 @@ one. I don't really do well with tutorials, so I decided to set myself a small p
 ## The goal
 The goal is to just write a simple command-line app to fetch the current weather at the current location. Here are the steps:
 
-1. Read the API key for [freegeoip.app](https://freegeoip.app/) from an environment variable
-2. Call FreeGeoIpAPI to get the coordinates of the current IP address
+1. Read the API key for [ipbase.com](https://ipbase.com/) from an environment variable
+2. Call ipbase.com to get the coordinates of the current IP address
 3. Call the [weather.gov API](https://www.weather.gov/documentation/services-web-api) to get the current weather
 4. Optionally write the weather to a file (based on a command line argument)
 5. Print the weather and exit

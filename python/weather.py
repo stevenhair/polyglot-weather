@@ -13,7 +13,7 @@ import aiohttp
 
 logging.basicConfig(level=logging.INFO)
 
-API_KEY = os.getenv('FREEGEOIP_API_KEY')
+API_KEY = os.getenv('IPBASE_API_KEY')
 LOGGER = logging.getLogger('weather')
 
 
@@ -34,7 +34,7 @@ def _exit_with_error(message: str) -> None:
 
 
 async def get_coordinates() -> Tuple[float, float]:
-    url = f'https://api.freegeoip.app/json/?apikey={API_KEY}'
+    url = f'https://api.ipbase.com/json/?apikey={API_KEY}'
     LOGGER.debug(f'Fetching GeoIP data from {url}')
 
     async with aiohttp.ClientSession() as session:
